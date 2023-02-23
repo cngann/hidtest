@@ -29,58 +29,19 @@ import com.sun.jna.Platform;
 import org.hid4java.*;
 import org.hid4java.event.HidServicesEvent;
 
-import java.util.concurrent.TimeUnit;
-
-import static java.util.concurrent.TimeUnit.NANOSECONDS;
-
 public class BaseExample implements HidServicesListener {
 
     public static final String ANSI_RESET = "\u001B[0m";
-    public static final String ANSI_BLACK = "\u001B[30m";
     public static final String ANSI_RED = "\u001B[31m";
     public static final String ANSI_GREEN = "\u001B[32m";
     public static final String ANSI_YELLOW = "\u001B[33m";
     public static final String ANSI_BLUE = "\u001B[34m";
     public static final String ANSI_PURPLE = "\u001B[35m";
-    public static final String ANSI_CYAN = "\u001B[36m";
-    public static final String ANSI_WHITE = "\u001B[37m";
 
     public void printPlatform() {
         System.out.println("Platform architecture: " + Platform.ARCH);
         System.out.println("Resource prefix: " + Platform.RESOURCE_PREFIX);
         System.out.println("Libusb activation: " + Platform.isLinux());
-    }
-
-    public void waitAndShutdown(HidServices hidServices) {
-        System.out.printf(ANSI_YELLOW + "Waiting 30s to demonstrate attach/detach handling. Watch for slow response after write if configured.%n" + ANSI_RESET);
-        sleepNoInterruption();
-        System.out.printf(ANSI_YELLOW + "Triggering shutdown...%n" + ANSI_RESET);
-        hidServices.shutdown();
-    }
-
-    /**
-     * Invokes {@code unit.}{@link TimeUnit#sleep(long) sleep(sleepFor)}
-     * uninterruptibly.
-     */
-    public static void sleepNoInterruption() {
-        boolean interrupted = false;
-        try {
-            long remainingNanos = TimeUnit.SECONDS.toNanos(30);
-            long end = System.nanoTime() + remainingNanos;
-            while (true) {
-                try {
-                    NANOSECONDS.sleep(remainingNanos);
-                    return;
-                } catch (InterruptedException e) {
-                    interrupted = true;
-                    remainingNanos = end - System.nanoTime();
-                }
-            }
-        } finally {
-            if (interrupted) {
-                Thread.currentThread().interrupt();
-            }
-        }
     }
 
     @Override
@@ -108,5 +69,4 @@ public class BaseExample implements HidServicesListener {
         }
         System.out.println(ANSI_RESET);
     }
-
 }
