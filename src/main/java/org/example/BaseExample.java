@@ -28,7 +28,6 @@ package org.example;
 import com.sun.jna.Platform;
 import org.hid4java.*;
 import org.hid4java.event.HidServicesEvent;
-import org.hid4java.jna.HidApi;
 
 public class BaseExample implements HidServicesListener {
 
