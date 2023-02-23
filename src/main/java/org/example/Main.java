@@ -21,6 +21,8 @@ public class Main extends BaseExample {
                 return hidDevice;
             }
         }
+        System.out.println("No PTT Devices Found, exiting");
+        System.exit(0);
         return null;
     }
 
