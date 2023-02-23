@@ -28,6 +28,7 @@ package org.example;
 import com.sun.jna.Platform;
 import org.hid4java.*;
 import org.hid4java.event.HidServicesEvent;
+import org.hid4java.jna.HidApi;
 
 public class BaseExample implements HidServicesListener {
 
@@ -47,6 +48,7 @@ public class BaseExample implements HidServicesListener {
     @Override
     public void hidDeviceAttached(HidServicesEvent event) {
         System.out.println(ANSI_BLUE + "Device attached: " + event + ANSI_RESET);
+        openPttDevice(event.getHidDevice());
     }
 
     @Override
@@ -69,4 +71,49 @@ public class BaseExample implements HidServicesListener {
         }
         System.out.println(ANSI_RESET);
     }
+
+    public boolean isPttDevice(HidDevice device) {
+        return device.getUsagePage() == 0x1 && device.getUsage() == 0x4;
+    }
+
+    public HidDevice findPttDevice(HidServices services) {
+        for (HidDevice hidDevice : services.getAttachedHidDevices()) {
+            System.out.println(hidDevice.getManufacturer());
+            System.out.println(hidDevice);
+            if (isPttDevice(hidDevice)) {
+                System.out.println("Found PTT Device");
+                return hidDevice;
+            }
+        }
+        System.out.println("No PTT Devices Found");
+        System.exit(1);
+        return null;
+    }
+
+    public HidDevice init() {
+//        HidApi.logTraffic = true;
+        HidServicesSpecification hidServicesSpecification = new HidServicesSpecification();
+        hidServicesSpecification.setAutoStart(false);
+        HidServices services = HidManager.getHidServices(hidServicesSpecification);
+        services.addHidServicesListener(this);
+        System.out.println(ANSI_GREEN + "Manually starting HID services." + ANSI_RESET);
+        services.start();
+        System.out.println(ANSI_GREEN + "Enumerating attached devices..." + ANSI_RESET);
+        HidDevice device = findPttDevice(services);
+        openPttDevice(device);
+        return device;
+    }
+    public void openPttDevice(HidDevice device) {
+        device.open();
+    }
+
+    public void readFromPttDevice(HidDevice device) {
+        byte[] bytes = device.readAll(10);
+        if (bytes.length == 0) return;
+        for (byte b : bytes) {
+            System.out.printf(" %02x", b);
+        }
+        System.out.println();
+    }
+
 }
